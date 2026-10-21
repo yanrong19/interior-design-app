@@ -1,0 +1,166 @@
+.section { margin-top: 200px; }
+
+.head {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 24px;
+  align-items: end;
+  padding: 0 clamp(20px, 5vw, 88px);
+}
+.title { grid-column: 1 / span 6; font-size: var(--step-head); }
+.headSide { grid-column: 8 / span 5; display: grid; gap: 20px; }
+.lead { max-width: 40ch; }
+
+.filters { display: flex; flex-wrap: wrap; gap: 4px; }
+.filter {
+  position: relative;
+  height: 36px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  font-size: var(--step-small);
+  color: var(--muted);
+  transition: color 200ms var(--ease-out);
+}
+.filter:hover { color: var(--ink); }
+.filter[aria-checked='true'] { color: #fff; }
+.filterPill { position: absolute; inset: 0; border-radius: 999px; background: var(--ink); }
+.filterLabel { position: relative; }
+
+.strip {
+  display: flex;
+  gap: 16px;
+  margin-top: 48px;
+  padding: 0 clamp(20px, 5vw, 88px) 8px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scroll-padding: 0 clamp(20px, 5vw, 88px);
+  scrollbar-width: none;
+  cursor: grab;
+  user-select: none;
+}
+.strip::-webkit-scrollbar { display: none; }
+.strip:active { cursor: grabbing; }
+
+.item { flex: none; width: clamp(260px, 26vw, 400px); scroll-snap-align: start; }
+
+.card {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  color: inherit;
+  cursor: inherit;
+}
+.cardMedia { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: var(--control); }
+.cardImg { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 900ms var(--ease-out); }
+.card:hover .cardImg, .card:focus-visible .cardImg { transform: scale(1.06); }
+
+.cardHover {
+  position: absolute;
+  inset: 0 0 auto 0;
+  aspect-ratio: 4 / 5;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 20px;
+  background: rgba(20, 20, 20, 0.55); /* neutral scrim under text on a photo */
+  color: #fff;
+  font-size: var(--step-small);
+  opacity: 0;
+  transition: opacity 400ms var(--ease-out);
+  pointer-events: none;
+}
+.cardHover span { transform: translateY(12px); transition: transform 500ms var(--ease-out); }
+.card:hover .cardHover, .card:focus-visible .cardHover { opacity: 1; }
+.card:hover .cardHover span, .card:focus-visible .cardHover span { transform: none; }
+
+.cardText { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-top: 14px; }
+.cardTitle { font-size: var(--step-lead); line-height: 1.1; }
+.cardStyle { font-size: var(--step-small); color: var(--muted); white-space: nowrap; }
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-top: 28px;
+  padding: 0 clamp(20px, 5vw, 88px);
+}
+.track { position: relative; flex: 1; height: 2px; background: var(--control); overflow: hidden; }
+.trackFill { position: absolute; inset: 0; background: var(--ink); transform-origin: left; }
+.arrows { display: flex; gap: 8px; }
+.arrow {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--control);
+  transition: background-color 200ms var(--ease-out), color 200ms var(--ease-out);
+}
+.arrow:hover { background: var(--ink); color: #fff; }
+
+/* ---------- Full view ---------- */
+.viewRoot { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; padding: 24px; }
+.viewScrim { position: absolute; inset: 0; background: rgba(14, 14, 14, 0.72); }
+.view {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  width: min(1180px, 100%);
+  max-height: calc(100svh - 48px);
+  background: var(--paper);
+  overflow: hidden;
+}
+.viewMedia { position: relative; min-height: 0; aspect-ratio: 4 / 5; max-height: calc(100svh - 48px); overflow: hidden; }
+.viewBody { position: relative; padding: clamp(28px, 4vw, 56px); overflow-y: auto; }
+.close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--control);
+}
+.close:hover { background: var(--ink); color: #fff; }
+.viewStyle { color: var(--muted); font-size: var(--step-small); }
+.viewTitle { margin-top: 8px; font-size: var(--step-head); max-width: 12ch; }
+.viewH { margin-top: 32px; font-size: var(--step-small); font-weight: 600; }
+.viewList { margin-top: 8px; display: grid; gap: 6px; }
+.viewList li::before { content: '– '; color: var(--muted); }
+.viewProducts { margin-top: 8px; display: grid; gap: 4px; }
+.viewProducts a { display: grid; grid-template-columns: 56px 1fr auto; gap: 14px; align-items: center; padding: 6px; text-decoration: none; transition: background-color 200ms var(--ease-out); }
+.viewProducts a:hover { background: var(--control); }
+.viewProducts img { width: 56px; height: 56px; object-fit: cover; }
+.viewProducts small { display: block; color: var(--muted); font-size: var(--step-small); }
+.viewActions { display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: center; margin-top: 36px; }
+.viewPrimary { display: inline-flex; align-items: center; height: 48px; padding: 0 22px; background: var(--ink); color: #fff; text-decoration: none; font-size: var(--step-small); font-weight: 500; }
+.viewPrimary:hover { background: var(--accent); }
+.viewSecondary { font-size: var(--step-small); font-weight: 500; }
+
+@media (max-width: 860px) {
+  .head { grid-template-columns: 1fr; }
+  .title, .headSide { grid-column: 1; }
+  .view { grid-template-columns: 1fr; overflow-y: auto; }
+  .viewMedia { aspect-ratio: 16 / 10; }
+  .viewRoot { padding: 0; place-items: stretch; }
+  .view { max-height: 100svh; height: 100svh; }
+}
+@media (max-width: 760px) {
+  .section { margin-top: 120px; }
+  .item { width: 74vw; }
+  .arrows { display: none; }
+}
+@media (hover: none) {
+  .cardHover { display: none; }
+}

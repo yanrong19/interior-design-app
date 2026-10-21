@@ -1,0 +1,40 @@
+// Placeholder photography: Unsplash hotlinks (Unsplash licence). Swap for your own photos later.
+export function unsplash(id: string, w: number, h: number): string {
+  return `https://images.unsplash.com/photo-${id}?w=${w}&h=${h}&fit=crop&q=75&auto=format`;
+}
+
+export const photos = {
+  livingYellowChair: '1586023492125-27b2c045efd7',
+  livingLounge: '1618221195710-dd6b41faaea6',
+  livingPlants: '1600210492486-724fe5c67fb0',
+  bedroomClassic: '1505693416388-ac5ce068fe85',
+  sofaGreen: '1555041469-a586c61ea9bc',
+  livingGreySofa: '1493663284031-b7e3aefcae8e',
+  studioChairs: '1524758631624-e2822e304c36',
+  bedroomBoho: '1615874959474-d609969a20ed',
+  livingSectional: '1616486338812-3dadae4b4ace',
+  diningGreen: '1617806118233-18e1de247200',
+  livingBoucle: '1631679706909-1844bbd07221',
+  kitchenWhite: '1507089947368-19c1da9775ae',
+  sofaBlue: '1484101403633-562f891dc89a',
+  roomMinimal: '1513694203232-719a280e022f',
+  bedroomOttomans: '1540518614846-7eded433c457',
+  sofaOrange: '1567016432779-094069958ea5',
+  loftLiving: '1538688525198-9b88f6f53126',
+  chairShell: '1592078615290-033ee584e267',
+  lampFloor: '1507473885765-e6ed057f782c',
+  lampPendant: '1513506003901-1e6a229e2d15',
+  tableRound: '1533090481720-856c6e3c1fdc',
+  stoolBar: '1581539250439-c96689b516dd',
+  livingOpenPlan: '1600607687939-ce8a6c25118c',
+  livingCoffered: '1598928506311-c55ded91a20c',
+  bedroomBlack: '1586105251261-72a756497a11',
+  bedroomWhite: '1595526114035-0d45ed16cfbf',
+  stoolAsh: '1503602642458-232111445657',
+  chairWhite: '1519947486511-46149fa0a254',
+  shelvesOak: '1594026112284-02bb6f3352fe',
+  sofaTan: '1578500494198-246f612d3b3d',
+  sectionalDark: '1550581190-9c1c48d21d6c',
+  bedTufted: '1582582621959-48d27397dc69',
+  livingBright: '1560448204-e02f11c3d0e2',
+} as const;

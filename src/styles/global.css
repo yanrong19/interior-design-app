@@ -1,0 +1,158 @@
+/* Roomwright design tokens.
+   Brand palette from the strategy brief: paper, charcoal ink, slate.
+   One accent (eucalyptus) for the main data element and selection only. */
+:root {
+  --paper: #f9f9fb;
+  --surface: #ffffff;
+  --ink: #1a1a1a;
+  --muted: #5d6b7e;        /* slate, darkened a step for 4.5:1 on paper */
+  --slate: #64748b;
+  --frame: #eef0ec;        /* app chrome: a green-grey step from the eucalyptus */
+  --well: #f3f4f1;         /* canvas well, one step under the sheet */
+  --edge: #e5e6e2;         /* the sheet's 1px edge */
+  --rule: #ecedea;
+  --control: #e9eae6;      /* neutral pill / secondary button */
+  --accent: #2f5d50;
+  --accent-pale: #e2ebe7;
+  --positive: #23683f;
+  --positive-pale: #e1f1e6;
+  --negative: #a8321f;
+  --negative-pale: #fbe9e5;
+  --warn: #8a5a00;
+  --warn-pale: #fbf0d9;
+
+  --font: 'Work Sans', system-ui, sans-serif;
+  --font-display: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
+
+  /* The page's five type steps. Every Home size maps to one of these. */
+  --step-small: 0.875rem;                                   /* 14px: labels, captions, controls */
+  --step-body: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);  /* 17–19px: running text */
+  --step-lead: clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem);    /* 20–26px: statements, units, inputs */
+  --step-head: clamp(2.25rem, 1.4rem + 2.8vw, 4rem);        /* 36–64px: section headings, figures */
+  --step-display: clamp(3.25rem, 1.6rem + 5.6vw, 7.5rem);   /* 52–120px: hero, split heading, closing */
+
+  --radius-sheet: 16px;
+  --radius-control: 8px;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: var(--step-body);
+  line-height: 1.55;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, p, figure, ul, ol, dl, dd { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+img { display: block; max-width: 100%; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+a { color: inherit; text-underline-offset: 0.2em; }
+
+/* Lenis smooth scrolling (Home and Knowledge Base only) */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+/* Display serif for headings; one family per role */
+.display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+}
+.display em { font-style: italic; }
+
+::selection { background: var(--accent); color: #fff; }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Shared buttons: square-cornered on the page, 8px inside the app. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--control);
+  color: var(--ink);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 160ms var(--ease-out), transform 160ms var(--ease-out);
+}
+.btn:hover { background: #dfe0dc; }
+.btn:active { transform: translateY(1px); }
+.btn-primary { background: var(--ink); color: #fff; }
+.btn-primary:hover { background: #333; }
+.btn-danger { background: var(--negative); color: #fff; }
+.btn-danger:hover { background: #8e2818; }
+.btn-ghost { background: transparent; }
+.btn-ghost:hover { background: var(--control); }
+.btn-icon { width: 36px; padding: 0; }
+.btn[disabled] { opacity: 0.45; cursor: not-allowed; }
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  white-space: nowrap;
+  background: var(--control);
+  color: var(--ink);
+}
+.pill-pass { background: var(--positive-pale); color: var(--positive); }
+.pill-fail { background: var(--negative-pale); color: var(--negative); }
+.pill-warn { background: var(--warn-pale); color: var(--warn); }
+.pill-accent { background: var(--accent-pale); color: var(--accent); }
+
+/* Section entrances: only when JS has marked the document, so content never stays hidden. */
+.js-motion [data-reveal] {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 700ms var(--ease-out), transform 700ms var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 80ms);
+}
+.js-motion [data-reveal].is-in { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .js-motion [data-reveal] { opacity: 1; transform: none; }
+}

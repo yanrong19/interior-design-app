@@ -1,0 +1,175 @@
+/* Pinned for (rooms - 1) screens of scroll; the stage fills the viewport while the rooms change. */
+.section {
+  position: relative;
+  height: calc(var(--rooms) * 100svh);
+  --s: 0;
+  background: var(--ink);
+}
+.still { height: 100svh; }
+
+.sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+  color: #fff;
+}
+
+.stage { position: absolute; inset: 0; --t: 0; background: #2a2a2a; }
+
+.layer {
+  position: absolute;
+  inset: 0;
+  background-size: 100% 100%;
+  background-position: center;
+  transition: opacity 900ms ease;
+}
+
+.grid { position: absolute; inset: 0; display: grid; }
+
+/* Each tile turns on when the scroll passes its place in the shuffled order. */
+.cell {
+  --c: clamp(0, calc((var(--t) - var(--o)) * 3.6), 1);
+  opacity: var(--c);
+  transform: scale(calc(1.18 - 0.18 * var(--c)));
+  background-repeat: no-repeat;
+  will-change: opacity, transform;
+  /* tiles overlap by a hair so no seams show at fractional sizes */
+  margin: -0.5px;
+}
+
+.scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(14, 14, 14, 0.62) 0%, rgba(14, 14, 14, 0.28) 55%, rgba(14, 14, 14, 0.12) 100%); /* taste-skill-ignore: neutral scrim under text on a photo */
+  pointer-events: none;
+}
+
+.content {
+  position: absolute;
+  left: clamp(20px, 5vw, 88px);
+  right: clamp(20px, 5vw, 88px);
+  top: 50%;
+  transform: translateY(-46%);
+  max-width: 46rem;
+}
+/* Scroll position (--s) fades the opening copy out as the second room arrives. */
+.content {
+  --away: clamp(0, calc((var(--s) - 0.12) * 2.4), 1);
+  opacity: calc(1 - var(--away));
+  translate: 0 calc(var(--away) * -56px);
+}
+.contentAway { pointer-events: none; }
+
+.roomTitle {
+  position: absolute;
+  left: clamp(20px, 5vw, 88px);
+  right: clamp(20px, 5vw, 88px);
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.roomName { font-size: var(--step-display); line-height: 0.92; max-width: 11ch; }
+.roomMeta { margin-top: 20px; font-size: var(--step-body); color: rgba(255, 255, 255, 0.86); }
+
+/* The small caption hands over to the large room name. */
+.caption { opacity: calc(1 - clamp(0, calc((var(--s) - 0.4) * 3), 1)); }
+
+.title { font-size: var(--step-display); line-height: 0.92; }
+.lead { margin-top: 28px; max-width: 38ch; font-size: var(--step-body); color: rgba(255, 255, 255, 0.88); }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 28px; margin-top: 36px; }
+.primary {
+  display: inline-flex;
+  align-items: center;
+  height: 52px;
+  padding: 0 28px;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: var(--step-small);
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 200ms var(--ease-out), color 200ms var(--ease-out);
+}
+.primary:hover { background: var(--accent); color: #fff; }
+.secondary {
+  position: relative;
+  padding: 6px 0;
+  color: #fff;
+  font-size: var(--step-small);
+  font-weight: 500;
+  text-decoration: none;
+}
+.secondary::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px; /* taste-skill-ignore: link underline */
+  background: currentColor;
+  transform-origin: left;
+  transition: transform 400ms var(--ease-out);
+}
+.secondary:hover::after { transform: scaleX(0.35); }
+
+.foot {
+  position: absolute;
+  left: clamp(20px, 5vw, 88px);
+  right: clamp(20px, 5vw, 88px);
+  bottom: clamp(24px, 4vh, 44px);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 16px 32px;
+}
+.caption { min-height: 4.2rem; }
+.captionTitle { font-size: var(--step-lead); line-height: 1.1; }
+.captionMeta { margin-top: 4px; font-size: var(--step-small); color: rgba(255, 255, 255, 0.78); }
+
+.bars { display: flex; gap: 8px; }
+.bar {
+  width: clamp(36px, 5vw, 64px);
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  display: flex;
+  align-items: center;
+}
+.barFill {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.32);
+  overflow: hidden;
+}
+.barFill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  transform-origin: left;
+  transform: scaleX(clamp(0, calc(var(--s) - var(--i) + 1), 1));
+}
+.still .barFill::after { transform: scaleX(0); transition: transform 400ms var(--ease-out); }
+.still .bar[aria-current='true'] .barFill::after { transform: scaleX(1); }
+.bar:hover .barFill { background: rgba(255, 255, 255, 0.55); }
+
+.hint {
+  grid-column: 1 / -1;
+  justify-self: end;
+  font-size: var(--step-small);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+@media (max-width: 760px) {
+  .section { height: calc(var(--rooms) * 85svh); }
+  .still { height: 100svh; }
+  .content { top: auto; bottom: 168px; transform: none; }
+  .scrim { background: linear-gradient(0deg, rgba(14, 14, 14, 0.78) 0%, rgba(14, 14, 14, 0.35) 60%, rgba(14, 14, 14, 0.15) 100%); } /* taste-skill-ignore: neutral scrim under text on a photo */
+  .actions { gap: 16px 24px; }
+  .primary { flex: 1 1 100%; justify-content: center; }
+  .foot { grid-template-columns: 1fr; }
+  .hint { display: none; }
+}

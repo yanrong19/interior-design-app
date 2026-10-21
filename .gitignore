@@ -1,0 +1,7 @@
+node_modules
+dist
+.taste-skill
+.impeccable
+*.tsbuildinfo
+# Third-party design skills (Taste, Impeccable) installed locally; not part of the app
+.claude/skills/

@@ -1,0 +1,336 @@
+/* Builder canvas: 44px top bar on the ground, then three panels with 8px margins and a 12px gap.
+   232 (library) + 12 + fluid canvas + 12 + 320 (assistant) + 16 margins = the window. */
+.app {
+  height: 100svh;
+  display: grid;
+  grid-template-rows: 44px minmax(0, 1fr);
+  background: var(--frame);
+  font-size: 0.875rem;
+}
+
+.top { position: relative; z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 8px; }
+
+/* Inline confirmation under the Save button: only for overwriting a different saved plan. */
+.confirm {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 8px;
+  width: min(380px, calc(100vw - 16px));
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--edge);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.16); /* taste-skill-ignore: confirmation floats over the plan */
+  font-size: 0.875rem;
+}
+.confirmTitle { font-size: 1rem; font-weight: 600; }
+.confirmActions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px; }
+.topLeft, .topRight { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.nameH1 { font-size: 1rem; font-weight: 600; margin: 0; }
+.nameInput {
+  min-width: 6ch;
+  max-width: 28ch;
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  background: transparent;
+  font-size: 1rem;
+  font-weight: 600;
+}
+.nameInput:hover { border-color: var(--edge); }
+.nameInput:focus { outline: none; border-color: var(--ink); background: var(--surface); }
+.topSelect {
+  height: 32px;
+  padding: 0 28px 0 10px;
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  font-size: 0.875rem;
+}
+.lightToggle { display: inline-flex; padding: 2px; gap: 2px; border-radius: 10px; background: var(--control); }
+.lightToggle button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 0.8125rem;
+  color: #3f4a58;
+}
+.lightToggle button { position: relative; }
+.lightToggle button[aria-checked='true'] { color: var(--ink); font-weight: 500; }
+.lightPill { position: absolute; inset: 0; border-radius: 8px; background: var(--surface); }
+.lightLabel { position: relative; display: inline-flex; align-items: center; gap: 6px; }
+.divider { width: 1px; height: 24px; background: var(--edge); }
+
+.work {
+  display: grid;
+  grid-template-columns: 232px minmax(0, 1fr) 320px;
+  gap: 12px;
+  padding: 0 8px 8px;
+  min-height: 0;
+}
+
+/* ---------- Library ---------- */
+.library {
+  background: var(--surface);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-sheet);
+  padding: 12px;
+  overflow-y: auto;
+}
+.libSearch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: var(--radius-control);
+  background: var(--well);
+  color: var(--muted);
+}
+.libSearch input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--ink); font-size: 0.875rem; }
+.libSearch:focus-within { outline: 2px solid var(--accent); }
+.libGroup { margin-top: 16px; }
+.libHeading { font-size: 0.8125rem; font-weight: 600; color: var(--muted); padding: 0 4px 4px; }
+.libItem {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 32px 1fr 16px;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 4px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  text-align: left;
+  cursor: grab;
+}
+.libItem:hover { background: var(--well); }
+.libItem:active { cursor: grabbing; }
+.libThumb { width: 32px; height: 32px; border-radius: 4px; }
+.libName { font-size: 0.875rem; line-height: 1.25; }
+.libName small { display: block; color: var(--muted); font-size: 0.8125rem; }
+.libGrip { color: var(--muted); display: inline-flex; }
+.libHint { margin-top: 16px; padding: 0 4px; color: var(--muted); font-size: 0.8125rem; }
+
+/* ---------- Canvas ---------- */
+.canvasPanel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-sheet);
+  overflow: hidden;
+  min-height: 0;
+}
+.canvasOverlay {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+.canvasWell {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  padding: 48px 24px 8px;
+  background: var(--well);
+}
+.planSvg { width: 100%; height: 100%; max-height: 100%; touch-action: none; user-select: none; display: block; }
+.planLabel { font-size: 13px; fill: var(--muted); font-family: var(--font); }
+.planDim { font-size: 14px; fill: var(--ink); font-family: var(--font); }
+.pieceLabel { font-size: 12px; font-family: var(--font); font-weight: 500; pointer-events: none; }
+.measureText { font-size: 12px; fill: #fff; font-family: var(--font); font-weight: 600; }
+.piece { cursor: grab; outline: none; }
+.piece:active { cursor: grabbing; }
+.piece:focus-visible rect, .piece:focus-visible circle { stroke: var(--accent); stroke-width: 4; }
+
+.history { display: inline-flex; gap: 2px; }
+.history :global(.btn) { height: 32px; width: 32px; }
+
+.toast {
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: fit-content;
+  margin-inline: auto;
+  bottom: 140px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 40px;
+  padding: 0 6px 0 14px;
+  border-radius: 10px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18); /* taste-skill-ignore: transient notice floats over the plan */
+}
+.toastAction {
+  height: 30px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-weight: 600;
+}
+.toastAction:hover { background: rgba(255, 255, 255, 0.24); }
+
+.canvasHelp { padding: 8px 16px; background: var(--well); color: var(--muted); font-size: 0.8125rem; text-align: center; }
+.canvasHelp kbd { font: inherit; padding: 0 5px; border-radius: 4px; background: var(--surface); border: 1px solid var(--edge); color: var(--ink); }
+
+/* ---------- Swatch drawer ---------- */
+.drawer { background: var(--surface); border-top: 1px solid var(--edge); }
+.drawerBar { display: flex; align-items: center; gap: 16px; height: 44px; padding: 0 12px; }
+.drawerToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  font-weight: 600;
+}
+.drawerToggle:hover { background: var(--well); }
+.drawerChev, .drawerChevOpen { display: inline-flex; transition: transform 200ms var(--ease-out); }
+.drawerChev { transform: rotate(180deg); }
+.drawerTabs { display: flex; gap: 4px; }
+.drawerTabs button {
+  height: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--muted);
+}
+.drawerTabs button[aria-selected='true'] { color: var(--ink); border-bottom-color: var(--ink); font-weight: 500; }
+.drawerBody { padding: 4px 12px 12px; animation: drawerUp 280ms var(--ease-out); }
+@keyframes drawerUp { from { opacity: 0; transform: translateY(16px); } }
+.drawerEmpty { color: var(--muted); padding: 16px 4px; }
+.swatchRow { display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 4px; }
+.swatch {
+  width: 132px;
+  flex: none;
+  display: grid;
+  gap: 4px;
+  justify-items: start;
+  padding: 6px 6px 8px;
+  border: 1px solid var(--edge);
+  border-radius: 10px;
+  background: var(--surface);
+  text-align: left;
+  font-size: 0.8125rem;
+  transition: border-color 140ms var(--ease-out);
+}
+.swatch:hover { border-color: #c9cbc5; }
+.swatchOn { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.swatchArt { width: 100%; height: 48px; border-radius: 6px; display: block; }
+.swatchName { font-weight: 600; color: var(--ink); }
+.swatchNote { color: var(--muted); line-height: 1.3; }
+
+/* ---------- Assistant ---------- */
+.assistant {
+  background: var(--surface);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-sheet);
+  padding: 16px;
+  overflow-y: auto;
+  font-size: 0.875rem;
+}
+.asHead { display: grid; grid-template-columns: 56px 1fr; gap: 12px; align-items: center; }
+.asThumb { width: 56px; height: 56px; border-radius: 8px; }
+.asTitle { font-size: 1rem; font-weight: 600; line-height: 1.3; }
+.asMeta { color: var(--muted); margin-top: 2px; }
+.asActions { display: flex; gap: 8px; margin-top: 12px; }
+.asActions .btn { height: 32px; padding: 0 12px; }
+.asSection { margin-top: 20px; margin-bottom: 6px; font-size: 0.8125rem; font-weight: 600; color: var(--muted); }
+.asNote { margin-top: 6px; }
+.asLink { display: inline-flex; align-items: center; gap: 4px; margin-top: 10px; font-weight: 500; text-decoration: none; }
+.asLink:hover { text-decoration: underline; }
+
+.checks li { display: grid; grid-template-columns: 20px 1fr auto; gap: 8px; align-items: center; min-height: 44px; border-top: 1px solid var(--rule); }
+.checks small, .asProblems small, .asPairs small { display: block; color: var(--muted); font-size: 0.8125rem; }
+.checks strong { font-weight: 600; text-align: right; }
+.ok { color: var(--positive); display: inline-flex; }
+.bad { color: var(--negative); display: inline-flex; }
+.warnTxt { color: var(--warn); display: inline-flex; }
+
+.asScore { display: flex; align-items: baseline; gap: 8px; margin-top: 16px; padding: 12px; border-radius: 10px; background: var(--well); }
+.asScoreFig { font-size: 2rem; font-weight: 300; letter-spacing: -0.02em; line-height: 1; }
+.asScoreFig small { font-size: 1rem; color: var(--muted); }
+
+.asProblems button {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  gap: 8px;
+  padding: 8px 6px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  text-align: left;
+}
+.asProblems button:hover { background: var(--well); }
+
+.asPairs li { display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 44px; border-top: 1px solid var(--rule); }
+.asSwatches { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.asSwatches li { display: flex; align-items: center; gap: 8px; }
+.asSwatches span { width: 18px; height: 18px; border-radius: 4px; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08); flex: none; }
+
+/* ---------- Narrow screens ---------- */
+.phone { display: none; }
+
+/* Tablet: library on the left, plan on the right, assistant under the plan. */
+@media (max-width: 1100px) and (min-width: 701px) {
+  .app { height: auto; min-height: 100svh; grid-template-rows: auto auto; }
+  .top { flex-wrap: wrap; row-gap: 6px; padding: 6px 8px; }
+  .topRight { flex-wrap: wrap; }
+  .work {
+    grid-template-columns: 200px minmax(0, 1fr);
+    grid-template-areas: 'lib canvas' 'lib assist';
+    align-items: start;
+  }
+  .library { grid-area: lib; position: sticky; top: 8px; max-height: calc(100svh - 60px); }
+  .canvasPanel { grid-area: canvas; height: min(78svh, 760px); }
+  .assistant { grid-area: assist; overflow: visible; }
+  .topRight > a:global(.btn-ghost) { display: none; }
+  .lightToggle button { padding: 0 8px; }
+}
+
+@media (max-width: 700px) {
+  .app { height: auto; min-height: 100svh; grid-template-rows: auto auto; }
+  .top { flex-wrap: wrap; padding: 6px 8px; }
+  .topRight { flex-wrap: wrap; }
+  .divider, .topSelect, .history { display: none; }
+  .work { display: none; }
+  .phone { display: block; padding: 0 8px 24px; }
+  .phoneNote { padding: 12px; border-radius: 10px; background: var(--surface); border: 1px solid var(--edge); }
+  .phonePlan { margin-top: 8px; padding: 8px; border-radius: 12px; background: var(--well); border: 1px solid var(--edge); }
+  .phoneSum { margin-top: 12px; font-weight: 500; }
+  .phoneList { margin-top: 8px; background: var(--surface); border: 1px solid var(--edge); border-radius: 12px; padding: 0 12px; }
+  .phoneList li { display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 56px; }
+  .phoneList li + li { border-top: 1px solid var(--rule); }
+  .phoneList small { display: block; color: var(--muted); }
+}
