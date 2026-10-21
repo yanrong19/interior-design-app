@@ -1,0 +1,102 @@
+name: Build and deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# One deploy at a time; a newer push waits rather than cancelling a deploy mid-copy.
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  DEPLOY_HOST: 168.138.173.149
+  DEPLOY_USER: deploy
+  DEPLOY_PORT: 8082
+  SITE_ROOT: /var/www/roomwright
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Type-checks (tsc -b) and builds with Vite. Any error stops the pipeline here.
+      - run: npm run build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+          retention-days: 7
+
+  deploy:
+    needs: build
+    # Pull requests only build; only main deploys.
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: http://168.138.173.149:8082
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: deploy
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      - name: Set up SSH
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        run: |
+          if [ -z "$DEPLOY_SSH_KEY" ]; then
+            echo "::error::The DEPLOY_SSH_KEY secret is not set. See deploy/README.md."
+            exit 1
+          fi
+          install -m 700 -d "$HOME/.ssh"
+          printf '%s\n' "$DEPLOY_SSH_KEY" > "$HOME/.ssh/deploy_key"
+          chmod 600 "$HOME/.ssh/deploy_key"
+          # The server's host key is pinned in the repo, so a different machine at this IP is refused.
+          cp deploy/known_hosts "$HOME/.ssh/known_hosts"
+
+      - name: Upload new release
+        run: |
+          RELEASE="$(date -u +%Y%m%d%H%M%S)-${GITHUB_SHA::7}"
+          echo "RELEASE=$RELEASE" >> "$GITHUB_ENV"
+          rsync -az --delete --chmod=D755,F644 \
+            -e "ssh -i $HOME/.ssh/deploy_key -o StrictHostKeyChecking=yes" \
+            dist/ "$DEPLOY_USER@$DEPLOY_HOST:$SITE_ROOT/releases/$RELEASE/"
+
+      - name: Switch to the new release
+        run: |
+          ssh -i "$HOME/.ssh/deploy_key" -o StrictHostKeyChecking=yes "$DEPLOY_USER@$DEPLOY_HOST" bash -s <<EOF
+          set -euo pipefail
+          cd "$SITE_ROOT"
+          # Swap the link in one step so visitors never see a half-copied site.
+          ln -sfn "releases/$RELEASE" current.next
+          mv -Tf current.next current
+          # Keep the five newest releases for quick rollback.
+          ls -1dt releases/*/ | tail -n +6 | xargs -r rm -rf
+          echo "Live: \$(readlink current)"
+          EOF
+
+      - name: Check the site responds
+        run: |
+          ssh -i "$HOME/.ssh/deploy_key" -o StrictHostKeyChecking=yes "$DEPLOY_USER@$DEPLOY_HOST" \
+            "curl -fsS --retry 3 --retry-delay 2 http://127.0.0.1:$DEPLOY_PORT/ | grep -q 'id=\"root\"'"
+          echo "Deployed $RELEASE to http://$DEPLOY_HOST:$DEPLOY_PORT"

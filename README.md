@@ -28,3 +28,7 @@ Then open http://localhost:5173. Build with `npm run build`.
 - Photos are Unsplash hotlinks (Unsplash licence); swap in your own.
 - "Roomwright" is a placeholder name.
 - Design decisions are recorded in `docs/specs/`.
+
+## Deploy
+
+Pushes to `main` build on GitHub Actions and go live at http://168.138.173.149:8082. See [deploy/README.md](deploy/README.md).
